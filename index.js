@@ -73,14 +73,18 @@ app.get("/", async function (req, res) {
 
 app.get("/:sign", async function (req, res) {
 	const sign = req.params.sign.toLowerCase();
-	if (!signs.sign) return res.redirect(`/${signs.cancer}`);
+	if (!signs[sign]) return res.redirect(`/${signs.cancer}`);
 
 	const horoscopes = await Promise.all([
 		astroDotCom(sign),
 		truthStar(sign),
 		tarot(sign),
 	]);
-	res.render("template", { horoscopes, sign, signs: Object.values(signs) });
+	res.render("template", {
+		horoscopes,
+		sign: sign[0].toUpperCase() + sign.substring(1),
+		signs: Object.values(signs),
+	});
 });
 
 // Server
