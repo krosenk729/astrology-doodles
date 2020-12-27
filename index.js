@@ -5,6 +5,24 @@ const cheerio = require("cheerio");
 const cors = require("cors");
 const path = require("path");
 
+// Constants
+// ===========================================================
+
+const signs = {
+	aries: "Aries",
+	taurus: "Taurus",
+	gemini: "Gemini",
+	cancer: "Cancer",
+	leo: "Leo",
+	virgo: "Virgo",
+	libra: "Libra",
+	scorpio: "Scorpio",
+	sagittarius: "Sagittarius",
+	capricorn: "Capricorn",
+	aquarius: "Aquarius",
+	pisces: "Pisces",
+};
+
 // Express Middleware (Body Parse, Static Files, View Engines)
 // ===========================================================
 
@@ -17,8 +35,8 @@ app.use(cors());
 // Scraping Fns
 // ===========================================================
 
-const astroDotCom = async function () {
-	const url = "https://www.astrology.com/horoscope/daily/cancer.html";
+const astroDotCom = async function (sign) {
+	const url = `https://www.astrology.com/horoscope/daily/${sign}.html`;
 	const res = await fetch(url).then((res) => res.text());
 	const $ = cheerio.load(res);
 	const title = "Astrology Dot Com";
@@ -26,8 +44,8 @@ const astroDotCom = async function () {
 	return { title, body: body.text() };
 };
 
-const truthStar = async function () {
-	const url = "https://www.truthstar.com/daily-horoscope/cancer-daily-horoscope/";
+const truthStar = async function (sign) {
+	const url = `https://www.truthstar.com/daily-horoscope/${sign}-daily-horoscope/`;
 	const res = await fetch(url).then((res) => res.text());
 	const $ = cheerio.load(res);
 	const title = "Truth Star";
@@ -35,8 +53,8 @@ const truthStar = async function () {
 	return { title, body: body.text() };
 };
 
-const tarot = async function () {
-	const url = "https://www.tarot.com/daily-horoscope/cancer";
+const tarot = async function (sign) {
+	const url = `https://www.tarot.com/daily-horoscope/${sign}`;
 	const res = await fetch(url).then((res) => res.text());
 	const title = "Tarot";
 	let i = res.indexOf("scope_txt");
@@ -50,9 +68,19 @@ const tarot = async function () {
 // ===========================================================
 
 app.get("/", async function (req, res) {
-	const horoscopes = await Promise.all([astroDotCom(), truthStar(), tarot() ]);
+	res.redirect(`/${signs.cancer}`);
+});
 
-	res.render("template", { horoscopes });
+app.get("/:sign", async function (req, res) {
+	const sign = req.params.sign.toLowerCase();
+	if (!signs.sign) return res.redirect(`/${signs.cancer}`);
+
+	const horoscopes = await Promise.all([
+		astroDotCom(sign),
+		truthStar(sign),
+		tarot(sign),
+	]);
+	res.render("template", { horoscopes, sign, signs: Object.values(signs) });
 });
 
 // Server

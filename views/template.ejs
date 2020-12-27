@@ -1,15 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title></title>
+	<title>Astrology Doodles 💫✨🌠</title>
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 	<link href="https://fonts.googleapis.com/css2?family=Lato:wght@700&family=Merriweather&display=swap" rel="stylesheet">
 	<style type="text/css">
+		:root {
+			--pad: 1em;
+		}
+		body {
+			padding: var(--pad);
+		}
 		* {
 			font-family: 'Merriweather', serif;
 		}
 		h1, h2, h3, h4 {
 			font-family: 'Lato', sans-serif;
+		}
+		.visually-hidden {
+			position: absolute !important;
+			width: 1px !important;
+			height: 1px !important;
+			padding: 0 !important;
+			margin: -1px !important;
+			overflow: hidden !important;
+			clip: rect(0, 0, 0, 0) !important;
+			white-space: nowrap !important;
+			border: 0 !important;
+		}
+		input {
+			outline-offset: -2px;
+			display: block;
+			width: calc(100% - var(--pad) - var(--pad));
+			padding: .375rem .75rem;
+			font-size: 1rem;
+			font-weight: 400;
+			line-height: 1.5;
+			color: #212529;
+			background-color: #fff;
+			background-clip: padding-box;
+			border: 1px solid #ced4da;
+			-webkit-appearance: none;
+			-moz-appearance: none;
+			appearance: none;
+			border-radius: .25rem;
+			transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 		}
 		.horoscope {}
 		.horoscope__title {}
@@ -17,11 +52,31 @@
 	</style>
 </head>
 <body>
-	<h1>Cancer Daily Horoscopes</h1>
+	<h1><%= sign[0].toUpperCase() + sign.substring(1) %> Daily Horoscopes</h1>
 	<br>
-  <% horoscopes.forEach(function(horoscope, i){ %>
-    <% if(i > 0){ %><hr><% } %>
-    <%- include('partial', { horoscope: horoscope }); %>
-  <% }); %>
+	<label for="sign-choice" class="visually-hidden">Choose a Sign:</label>
+	<input list="signs" id="sign-choice" name="sign-choice" value="<%= sign %>" />
+	<datalist id="signs">
+		<% signs.forEach(function(s){ %>
+			<option value="<%= s %>" />
+		<% }); %>
+	</datalist>
+	<br>
+	<% horoscopes.forEach(function(horoscope, i){ %>
+		<% if(i > 0){ %><hr><% } %>
+		<%- include('partial', { horoscope: horoscope }); %>
+	<% }); %>
+	<script type="text/javascript">
+		(() => {
+			const inpt = document.getElementById("sign-choice");
+			console.log('********* inpt')
+			// Clear on enter / restore on exit
+			// ===========================================================
+
+			// Handle change redirection
+			// ===========================================================
+
+		})();
+	</script>
 </body>
 </html>
