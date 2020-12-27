@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Lato:wght@700&family=Merriweather&display=swap" rel="stylesheet">
+	<style type="text/css">
+		* {
+			font-family: 'Merriweather', serif;
+		}
+		h1, h2, h3, h4 {
+			font-family: 'Lato', sans-serif;
+		}
+		.horoscope {}
+		.horoscope__title {}
+		.horoscope__body {}
+	</style>
+</head>
+<body>
+	<h1>Cancer Daily Horoscopes</h1>
+	<br>
+  <% horoscopes.forEach(function(horoscope, i){ %>
+    <% if(i > 0){ %><hr><% } %>
+    <%- include('partial', { horoscope: horoscope }); %>
+  <% }); %>
+</body>
+</html>
