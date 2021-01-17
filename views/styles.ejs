@@ -1,8 +1,12 @@
 <style type="text/css">
 	:root {
 		--pad: 1em;
+		--bordr: 5px;
+		--grad: linear-gradient(-145deg, #69EACB 0%, #EACCF8 48%, #6654F1 100%);
+		--blk: #212121;
 	}
 	body {
+		color: var(--blk);
 		padding: var(--pad);
 		padding-bottom: calc(2*var(--pad));
 	}
@@ -14,11 +18,17 @@
 	}
 	h1 {
 		text-align: center;
-		font-size: 5rem;
-		font-size: 8ch;
+		font-size: 4rem;
+	}
+	hr {
+		margin: 1.5rem 0;
+	}
+	.no-spacing {
+		margin: 0;
+		padding: 0;
 	}
 	.gradient {
-		background-image: linear-gradient(-145deg, #69EACB 0%, #EACCF8 48%, #6654F1 100%);
+		background-image: var(--grad);
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
 	}
@@ -54,4 +64,45 @@
 	.horoscope {}
 	.horoscope__title {}
 	.horoscope__body {}
+
+	.tab-set {
+		display: flex;
+		justify-content: center;
+	}
+	.tab-set__wrapper {
+		display: flex;
+		justify-content: space-evenly;
+		flex-grow: 1;
+		max-width: 350px;
+		list-style: none;
+	    padding-inline-start: 0;
+	}
+	.tab-set__item {
+		font-family: 'Lato', sans-serif;
+		flex: 1 0 50%;
+		text-align: center;
+		padding: var(--pad);
+		cursor: pointer;
+		/*border-radius: var(--pad);*/
+		background: white;
+		border: var(--bordr) solid;
+		border-image-source: var(--grad);
+  		border-width: calc(var(--bordr)/2);
+		border-image-slice: 1;
+		color: var(--blk);
+	}
+	/*.tab-set__item:first-of-type {
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
+	}
+	.tab-set__item:last-of-type {
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
+	}*/
+	.tab-set__item--selected {
+		cursor: none;
+		background: var(--blk);
+		border: var(--bordr) solid var(--blk);
+		color: white;
+	}
 </style>

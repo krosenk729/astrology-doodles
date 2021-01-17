@@ -17,12 +17,34 @@
 		<% }); %>
 	</datalist>
 	<br>
+	<nav class="tab-set no-spacing">
+		<ul class="tab-set__wrapper">
+			<li id="today"
+				role="button"
+				aria-selected="<%= !isTomorrow %>"
+				class="tab-set__item <%= isTomorrow ? '' : 'tab-set__item--selected' %>"
+				>
+				Toyay
+			</li>
+			<li id="tomorrow"
+				role="button"
+				aria-selected="<%= !!isTomorrow %>"
+				class="tab-set__item <%= isTomorrow ? 'tab-set__item--selected' : '' %>"
+				>
+				Tomorrow
+			</li>
+		</ul>
+	</nav>
+	<br>
 	<% horoscopes.forEach(function(horoscope, i){ %>
 		<% if(i > 0){ %><hr><% } %>
 		<%- include('partial', { horoscope: horoscope }); %>
 	<% }); %>
 	<script type="text/javascript">
 		(() => {
+			// Changing Signs
+			// ===========================================================
+
 			let restoreVal = "";
 			const inpt = document.getElementById("sign-choice");
 			const valid = <%- JSON.stringify(signs) %>;
@@ -46,6 +68,56 @@
 			// ===========================================================
 			inpt.onfocus = focus;
 			inpt.onchange = restore;
+		})();
+		(() => {
+			const selectedClass = "tab-set__item--selected";
+			const todayBtn = document.getElementById("today");
+			const tomBtn = document.getElementById("tomorrow");
+			let isTomorrow = getQueryFromUrl("tomorrow") === "true";
+
+			// Helpers
+			// ===========================================================
+			function getQueryFromUrl(name) {
+				const query = {};
+				const urlQuery = location.search;
+				urlQuery.split(/\?|&/g).forEach((segment) => {
+					const [nme, val] = segment.split('=');
+					query[nme] = val;
+				});
+				return query[name];
+			}
+
+			// Handle today/tomorrow
+			// ===========================================================
+			function daySwap(tomorrow) {
+				console.log('********** tomorrow', { tomorrow, isTomorrow })
+				if (isTomorrow === tomorrow) return;
+				const uri = `${location.origin}${location.pathname}`;
+				let url = `${uri}?json=true&tomorrow=${!!tomorrow}`;
+
+				fetch(url)
+					.then(res => res.json())
+					.then(res => {
+						for (let r of res) {
+							const [el] = document.getElementsByClassName(r.site);
+							if (el) el.querySelector('p').innerText = decodeURIComponent(r.body);
+						}
+						isTomorrow = tomorrow;
+						window.history.pushState(uri, document.querySelector('title').innerText, `${uri}?tomorrow=${isTomorrow}`);
+						if (isTomorrow) {
+							todayBtn.classList.remove(selectedClass);
+							tomBtn.classList.add(selectedClass);
+						} else {
+							todayBtn.classList.add(selectedClass);
+							tomBtn.classList.remove(selectedClass);
+						}
+					});
+			}
+
+			// Bind events
+			// ===========================================================
+			todayBtn.onclick = () => daySwap(false);
+			tomBtn.onclick = () => daySwap(true);
 		})();
 	</script>
 </body>

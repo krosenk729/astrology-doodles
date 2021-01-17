@@ -23,6 +23,12 @@ const signs = {
 	pisces: "Pisces",
 };
 
+const horoscopeSites = {
+	astroDotCom: 'astroDotCom',
+	truthStar: 'truthStar',
+	tarot: 'tarot',
+};
+
 // Express Middleware (Body Parse, Static Files, View Engines)
 // ===========================================================
 
@@ -44,7 +50,7 @@ const astroDotCom = async function (sign, isTomorrow = false) {
 	const $ = cheerio.load(res);
 	const title = "Astrology Dot Com";
 	const body = $(".horoscope-main.grid > main > p:nth-of-type(1)");
-	return { title, body: body.text() };
+	return { title, body: body.text(), site: horoscopeSites.astroDotCom };
 };
 
 const truthStar = async function (sign, isTomorrow = false) {
@@ -56,13 +62,19 @@ const truthStar = async function (sign, isTomorrow = false) {
 		? $(".entry-content h3:nth-of-type(3) ~ p")
 		: $(".entry-content h3:nth-of-type(2) ~ p");
 	body = body[0].children[0].data;
-	return { title, body };
+	return { title, body, site: horoscopeSites.truthStar };
 };
 
 const _getTomorrowFormatted = () => {
 	const dt = new Date();
 	dt.setDate(dt.getDate() + 1);
-	return `${dt.getFullYear()}-${dt.getMonth() + 1}-${dt.getDate()}`;
+
+	let day = dt.getDate();
+	if (day < 10) day = '0' + day;
+
+	let month = dt.getMonth() + 1;
+	if (month < 10) month = '0' + month;
+	return `${dt.getFullYear()}-${month}-${day}`;
 }
 const tarot = async function (sign, isTomorrow = false) {
 	const url = isTomorrow
@@ -72,10 +84,10 @@ const tarot = async function (sign, isTomorrow = false) {
 	const title = "Tarot";
 	let i = res.indexOf("scope_txt");
 	let body = res.substring(i + "scope_txt".length + 3);
-	i = body.indexOf("\"");
+	i = body.indexOf("\,\"");
 	body = body.substring(0, i);
 	body = decodeURIComponent(body);
-	return { title, body };
+	return { title, body: decodeURIComponent(body), site: horoscopeSites.tarot };
 };
 
 // Routes
@@ -87,7 +99,8 @@ app.get("/", async function (req, res) {
 
 app.get("/:sign", async function (req, res) {
 	const sign = req.params.sign.toLowerCase();
-	const isTomorrow = !!req.query.tomorrow;
+	const isTomorrow = req.query.tomorrow === 'true';
+	const json = !!req.query.json;
 	if (!signs[sign]) return res.redirect(`/${signs.cancer}`);
 
 	const horoscopes = await Promise.all([
@@ -95,11 +108,19 @@ app.get("/:sign", async function (req, res) {
 		truthStar(sign, isTomorrow),
 		tarot(sign, isTomorrow),
 	]);
+
+	if (json) {
+		res.json(horoscopes);
+		return;
+	}
+
 	res.render("template", {
 		horoscopes,
+		isTomorrow,
 		sign: sign[0].toUpperCase() + sign.substring(1),
 		signs: Object.values(signs),
 	});
+	return;
 });
 
 // Server
@@ -108,3 +129,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, function () {
 	console.log("App listening on PORT " + PORT);
 });
+
+process.on('uncaughtException', console.error);
